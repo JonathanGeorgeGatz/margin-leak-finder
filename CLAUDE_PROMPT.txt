@@ -1,0 +1,102 @@
+THE MARGIN LEAK FINDER — the exact prompts, in order
+Build It With AI — Episode 7
+=====================================================
+
+These are the three prompts used on camera, word for word. Two of them only
+exist because the first build was wrong. That is normal. The checker
+(checker.py, included) is how the wrongness was found — run it yourself.
+
+-----------------------------------------------------
+PROMPT 1 — THE SPEC
+-----------------------------------------------------
+
+I run a small candle company and I want to know which of my products still
+make money after true costs, using the exports I already have. Build it as a
+Google Sheets project: one script file of pure calculation, one thin file of
+sheet plumbing, so the math can be tested outside Google.
+
+GOAL
+One report: for every product sold in the period, what it really earned
+after every cost it causes — not just materials. Which products are leaking,
+and what the leaks cost per year at this run rate.
+
+DATA — three sheets I will fill myself:
+1. "Sales Export", pasted straight from my store export, one row per order
+   line: Date, Order ID, Product, Qty, Unit Price, Line Discount, Refunded.
+   Assume the paste is messy: extra spaces, inconsistent capitals in product
+   names, blank lines, the odd row from outside the period.
+2. "Product Costs", one row per product: Product, Materials per unit, Labor
+   minutes per unit, Packaging per unit, Shipping per unit (blank if never
+   shipped).
+3. "Settings": Card fee percent, Card fee per order, Labor rate per hour,
+   Monthly overhead, Overhead allocation basis (REVENUE, UNITS or LABOR),
+   Card fee on refunds (KEPT or RETURNED), Thin margin threshold percent,
+   Minimum units to grade, Period start, Period end.
+
+RULES — these carry the money:
+- Prices are money. Do the arithmetic in whole cents with one written-down
+  rounding rule, not in floating-point dollars.
+- A product is what the export calls it after trimming spaces and ignoring
+  case. "Sea Salt Jar" and "  sea salt jar " are the same product.
+- The card fee belongs to the ORDER: the percent applies to what the
+  customer was actually charged for the whole order, plus one per-order fee.
+  Spread it over the order's lines in proportion to what each line charged,
+  in whole cents that sum exactly.
+- Overhead for the period is allocated over what was sold and kept, by the
+  chosen basis.
+- True profit per product = revenue kept, minus materials, labor, packaging,
+  shipping, its share of card fees, and its share of overhead.
+
+SHOW ME
+A "Margin Report" sheet: per product — units, revenue kept, each cost,
+true profit, true margin, and a verdict: LEAKING if it loses money, THIN if
+the margin is under the threshold, EARNING otherwise. Worst first. Totals
+row. A plain-English summary at the top: how many products leak and what
+that costs per year.
+
+-----------------------------------------------------
+PROMPT 2 — THE FIX (written after the checker disagreed)
+-----------------------------------------------------
+
+An independent checker, written in a different language from your build,
+disagrees with it on 86 of the 225 fields in my report. Every disagreement
+traces to two decisions you made:
+
+1. You drop refunded lines at the door, as if the sale never happened. A
+   refund is not a disappearance. The customer's money went back, but the
+   materials, labor, packaging and shipping were already spent, and the
+   processor keeps its fee when the settings say KEPT. Refunds are a cost of
+   the product that caused them. Give every product a refund-cost column:
+   the spent unit costs of its refunded units plus their share of the card
+   fee, and keep refunded revenue out of revenue kept.
+
+2. You charge the per-order card fee on every LINE. A three-line order pays
+   the per-order fee once, not three times. Compute the fee per ORDER on the
+   order's charged total, then split it across the order's lines in
+   proportion to what each line charged, in whole cents that sum exactly.
+
+Do not tell me it is fixed. Re-run the comparison and show me zero
+disagreements, on my export and on the generated businesses.
+
+-----------------------------------------------------
+PROMPT 3 — THE MONEY THAT VANISHED
+-----------------------------------------------------
+
+$2,831.50 of my export never reaches the report, and nothing on the report
+says so. The gift cards and the workshop tickets have no cost rows, so you
+skip those lines silently. A report that quietly drops revenue is how margin
+leaks hide in the first place — the tool is doing the thing it exists to
+catch.
+
+Change it so the report accounts for every charged dollar in the export:
+- Every line the report cannot use is listed at the bottom with its sheet
+  row and the reason, and its revenue is counted.
+- Product Costs gets an IGNORE flag for lines that are real revenue but not
+  products — gift cards, tickets. Ignored revenue is shown, not graded.
+- A reconciliation line ties the report back to the export to the cent, and
+  says TIES OUT or DOES NOT TIE OUT.
+- While the unmatched revenue is more than half a percent of the export, the
+  report prints PROVISIONAL and withholds every verdict. A wrong grade is
+  worse than no grade.
+- And a product with fewer kept units than the minimum in Settings gets
+  LOW DATA instead of a verdict — two sales is an anecdote, not a margin.

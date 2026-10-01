@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>The Margin Leak Finder — free Google Sheets tool</title>
+<style>
+:root{--paper:#FAF6EE;--ink:#1F2430;--dim:#6B7382;--navy:#1D3557;--ochre:#8C6D1F;--leak:#8F1D1D;--rule:#E4DCC9}
+body{background:var(--paper);color:var(--ink);font:18px/1.6 -apple-system,"Segoe UI",Inter,Helvetica,Arial,sans-serif;margin:0;padding:16px}
+.wrap{max-width:880px;margin:40px auto}
+h1{font-size:44px;letter-spacing:-.02em;margin:0 0 8px}
+.sub{color:var(--dim);font-size:20px;margin-bottom:28px}
+.dl{display:inline-block;background:var(--navy);color:#fff;text-decoration:none;padding:14px 28px;border-radius:10px;font-size:19px;font-weight:600}
+.dl:hover{background:#27467A}
+.card{background:#fff;border:1px solid var(--rule);border-radius:14px;padding:24px 28px;margin:22px 0}
+.card h2{font-size:15px;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);margin:0 0 12px}
+code,.mono{font-family:"SF Mono",Menlo,Consolas,monospace;font-size:15px}
+ul{padding-left:22px} li{margin:6px 0}
+a{color:var(--navy)}
+.leak{color:var(--leak);font-weight:700}
+.foot{color:var(--dim);font-size:15px;margin-top:34px}
+</style></head><body><div class="wrap">
+<h1>The Margin Leak Finder</h1>
+<div class="sub">Paste a sales export into a Google Sheet. Find out which of your products still make money after true costs — materials, labor minutes, packaging, shipping, card fees charged the way processors actually charge them, refunds, and overhead. Free. No email. Your data never leaves your spreadsheet.</div>
+<a class="dl" href="Margin_Leak_Finder_BUNDLE.zip">Download the bundle (.zip, 58 KB)</a>
+<div class="card"><h2>What's in it</h2>
+<ul>
+<li><code>engine.gs</code> + <code>main.gs</code> — the tool (paste into Apps Script; setup steps in the README)</li>
+<li><code>checker.py</code> — an independent Python re-implementation, so you can verify the tool's numbers</li>
+<li><code>engine_v1.gs</code> — the first build, kept so you can see what was wrong with it</li>
+<li><code>sales_export.csv</code> + <code>product_costs.csv</code> — the fictional sample business (Copperline Candle Co.)</li>
+<li><code>CLAUDE_PROMPT.txt</code> — all three prompts, word for word</li>
+</ul></div>
+<div class="card"><h2>What it found on the sample business</h2>
+<ul>
+<li>The best seller by units was <span class="leak">losing $1.88 on every sale</span> — $4,435.90 a year of leaks at run rate</li>
+<li>A gift set that looked like 14.4% EARNING was <span class="leak">LEAKING</span> once refunds were priced in</li>
+<li>The report reconciles to the export to the cent, and refuses to grade anything while revenue is unaccounted</li>
+</ul></div>
+<div class="card"><h2>How it was tested</h2>
+<p class="mono">330 generated businesses · 72,558 report fields compared against the independent checker · 0 disagreements · 43 functional checks · every setting proven to move the output</p></div>
+<div class="foot">From the YouTube series <b>Build It With AI</b> — built on camera, bugs left in. Sample business and every number in it are fictional. This is arithmetic you can check, not accounting advice.</div>
+</div></body></html>
